@@ -17,6 +17,7 @@ public class OrderView {
 		this.ip = ip;
 		this.port = port;
 		this.time = time;
+		
 	}
 	
 	public void pintar(int posy) {
@@ -24,7 +25,8 @@ public class OrderView {
 		this.posy = posy;
 		
 		app.image(image,30,this.posy);
-		app.text(time,140,this.posy+10);
+		app.fill(0);
+		app.text(time,215,this.posy+80);
 		
 	}
 	

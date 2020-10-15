@@ -12,13 +12,17 @@ public class Main extends PApplet {
 	public  MainController controller;
 	
 	public void settings() {
-		size(500,500);
+		size(560,560);
 	}
 	public void setup() {
 		controller = new MainController(this);
 	}
 	public void draw() {
-		
+		background(0,100,100);
+		controller.pintarList();
+	}
+	public void mousePressed() {
+		controller.orderCheck();
 	}
 
 }

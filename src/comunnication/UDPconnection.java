@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.google.gson.Gson;
 
@@ -40,18 +42,24 @@ public class UDPconnection extends Thread{
 	public void run() {
 		
 		try {
-			socket = new DatagramSocket(6000);
+			socket = new DatagramSocket(5000);
 			
 			 while(true) {
 				 
-				 byte[] buffer = new byte [100];
+				 byte[] buffer = new byte [250];
 				 DatagramPacket packet = new DatagramPacket(buffer,buffer.length);
 				 socket.receive(packet);
 				 
 				 String ipPort = packet.getSocketAddress().toString();
-				 String netInfo[]=ipPort.split(";");
+			
+				 String netInfo[]=ipPort.split(":");
+				 String ip = netInfo[0];
+				 ip = ip.replace("/", "");
 				 
+				 int port = Integer.parseInt(netInfo[1]);
+				 System.out.println(ip + " "+port);
 				 String msg = new String (packet.getData()).trim();
+				 System.out.println(msg);
 				 
 				 Gson gson = new Gson();
 				 
@@ -61,7 +69,11 @@ public class UDPconnection extends Thread{
 				 
 				 case "Order":
 					 Order newOrder = gson.fromJson(msg,Order.class);
-					 observer.OnOrderReceived(newOrder,netInfo[0],Integer.parseInt(netInfo[1]));
+					  Date date = new Date();
+				      SimpleDateFormat sdf =  new SimpleDateFormat("HH:mm:ss");
+				       String time = sdf.format(date);
+					 newOrder.setTime(time);
+					 observer.OnOrderReceived(newOrder,ip,port);
 					 
 					 break;
 				 
@@ -93,8 +105,11 @@ public class UDPconnection extends Thread{
 						
 						InetAddress ip = InetAddress.getByName(direction);
 						DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.getBytes().length,ip,port);
-						
+						socket.send(packet);
 					} catch (UnknownHostException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}

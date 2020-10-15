@@ -29,8 +29,9 @@ public class MainController implements OnMessageListener{
 		orders = new ArrayList<OrderView>();
 		udp = UDPconnection.getInstance();
 		udp.setObserver(this);
-		orderMax = 4;
+		orderMax = 0;
 		cargarRecursos();
+		
 	}
 
 	
@@ -40,26 +41,24 @@ public class MainController implements OnMessageListener{
 	public void pintarList(){
 		
 		for(int i = 0; i< orders.size();i++) {
-			orders.get(i).pintar((i*140)+100);
+			orders.get(i).pintar((i*140)+10);
 		}
 		
 	}
 
-	@Override
-	public void OnOrderStatusReceived() {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 	@Override
 	public void OnOrderReceived(Order newOrder, String ip, int port) {
 		
+
 		if(orderMax<4) {
 			orderMax++;
 			switch(newOrder.getProduct()){
 			
 			case "Burger":
 				orders.add(new OrderView(app,burger,newOrder.getTime(),ip,port));
+				System.out.println("recibi burger");
 				break;
 			case "HotDog":
 				orders.add(new OrderView(app,hotDog,newOrder.getTime(),ip,port));
@@ -91,11 +90,17 @@ public class MainController implements OnMessageListener{
 	public void orderCheck() {
 		for(int j = 0; j< orders.size();j++) {
 			
-			if(orders.get(j).touchMe()) {
+			boolean orderChe = orders.get(j).touchMe();
+			//System.out.println(orderChe);
+			
+			if(orderChe) {
 				OrderStatus orderReady = new OrderStatus(true);
 				Gson gson = new Gson();
 				String msg = gson.toJson(orderReady);
+				System.out.println(msg);
+				System.out.println(orders.get(j).getIp()+" "+orders.get(j).getPort());
 				udp.sendMessage(msg,orders.get(j).getIp(),orders.get(j).getPort());
+				//System.out.println("entro");
 				orderMax--;
 				orders.remove(j);
 			}
@@ -108,6 +113,21 @@ public class MainController implements OnMessageListener{
 		hotDog = app.loadImage("../Resources/ProductImages/HotDogW.png");
 		burrito = app.loadImage("../Resources/ProductImages/BurritoW.png");
 		sandwich = app.loadImage("../Resources/ProductImages/SandwichW.png");
+		
+	}
+
+
+
+
+
+	@Override
+	public void OnLimitReceived() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void OnOrderStatusReceived() {
+		// TODO Auto-generated method stub
 		
 	}
 

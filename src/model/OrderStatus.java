@@ -12,9 +12,10 @@ public class OrderStatus {
 	}
 
 	public OrderStatus(boolean ready) {
-		ready = this.ready;
+		this.ready = ready;
 		id = UUID.randomUUID().toString();
 		type = "OrderStatus";
+		
 		
 	}
 
