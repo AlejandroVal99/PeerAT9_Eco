@@ -7,9 +7,16 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import com.google.gson.Gson;
+
+import events.OnMessageListener;
+import model.Generic;
+import model.Order;
+
 public class UDPconnection extends Thread{
 
 	private static UDPconnection instance;
+	private OnMessageListener observer;
 	
 	private UDPconnection () {
 		
@@ -22,14 +29,18 @@ public class UDPconnection extends Thread{
 		}
 		return instance;
 	}
-	
+	public void setObserver(OnMessageListener observer) {
+		
+		this.observer = observer;
+		
+	}
 	
 	private DatagramSocket socket;
 	
 	public void run() {
 		
 		try {
-			socket = new DatagramSocket(5000);
+			socket = new DatagramSocket(6000);
 			
 			 while(true) {
 				 
@@ -37,9 +48,28 @@ public class UDPconnection extends Thread{
 				 DatagramPacket packet = new DatagramPacket(buffer,buffer.length);
 				 socket.receive(packet);
 				 
+				 String ipPort = packet.getSocketAddress().toString();
+				 String netInfo[]=ipPort.split(";");
+				 
 				 String msg = new String (packet.getData()).trim();
 				 
-				 System.out.println(msg);
+				 Gson gson = new Gson();
+				 
+				 Generic generic = gson.fromJson(msg,Generic.class);
+				 
+				 switch(generic.getType()) {
+				 
+				 case "Order":
+					 Order newOrder = gson.fromJson(msg,Order.class);
+					 observer.OnOrderReceived(newOrder,netInfo[0],Integer.parseInt(netInfo[1]));
+					 
+					 break;
+				 
+				 }
+				 
+				 
+				 
+				 System.out.println(msg + ipPort);
 				 
 			 }
 			 

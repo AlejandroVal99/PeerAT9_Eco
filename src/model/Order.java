@@ -10,7 +10,7 @@ public class Order {
 	private String id;
 	private String type;
 	private String product;
-	private DatagramPacket packet;
+
 	private String ipport;
 	private Date date;
 	private SimpleDateFormat sdf;
@@ -28,7 +28,8 @@ public class Order {
 		time = sdf.format(date); 
 		id = UUID.randomUUID().toString();
 		type = "Order";
-		ipport = packet.getSocketAddress().toString();
+		
+	
 		
 	}
 	
